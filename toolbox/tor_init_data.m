@@ -1,4 +1,4 @@
-function data = tor_init_data(args)
+function data = tor_init_data(args,data)
 %TOR_INIT_DATA   Initialize toolbox data for an instance of 'tor'.
 %
 % Populate remaining fields of the toolbox data structure used by 'tor'
@@ -19,32 +19,58 @@ Th = 2*pi*(0:2*N)/(2*N+1);
 Th = kron(1:N, Th');
 F  = [ones(2*N+1,1) 2*reshape([cos(Th);sin(Th)], [2*N+1 2*N])]'/(2*N+1);
 
-data = struct();
 data.dim     = dim;
 data.N       = N;
 data.nsegs   = nsegs;
 data.Fs      = F;
 data.F       = kron(F, eye(dim));
-data.fhan    = @(t,x,p) args.fhan(t,x,p(1:end-2,:)); % with om and varrho added as the last two parameters
+if data.autonomous
+    data.fhan = @(t,x,p) args.fhan(x,p(1:end-3,:)); % with om1, om2 and varrho added as the last three parameters
+else
+    data.fhan = @(t,x,p) args.fhan(t,x,p(1:end-3,:));
+end
 if isempty(args.dfdxhan)
     data.dfdxhan = [];
 else
-    data.dfdxhan = @(t,x,p) args.dfdxhan(t,x,p(1:end-2,:));
+    if data.autonomous
+        data.dfdxhan = @(t,x,p) args.dfdxhan(x,p(1:end-3,:));
+    else
+        data.dfdxhan = @(t,x,p) args.dfdxhan(t,x,p(1:end-3,:));
+    end
+    
 end
 if isempty(args.dfdphan)
     data.dfdphan = [];
 else
-    data.dfdphan = @(t,x,p) [args.dfdphan(t,x,p(1:end-2,:)) zeros(size(x,1),2,numel(t))];
+    if data.autonomous
+        data.dfdphan = @(t,x,p) [args.dfdphan(x,p(1:end-3,:)) zeros(size(x,1),3,numel(t))];
+    else
+        data.dfdphan = @(t,x,p) [args.dfdphan(t,x,p(1:end-3,:)) zeros(size(x,1),3,numel(t))];
+    end
 end
 if isempty(args.dfdthan)
     data.dfdthan = [];
 else
-    data.dfdthan = @(t,x,p) args.dfdthan(t,x,p(1:end-2,:));
+    if data.autonomous
+        data.dfdthan = @(t,x,p) args.dfdthan(x,p(1:end-3,:));
+    else
+        data.dfdthan = @(t,x,p) args.dfdthan(t,x,p(1:end-3,:));
+    end
 end
-assert(~isempty(args.pnames), 'Om should include as a system parameter');
+switch data.nOmega
+    case 1
+        flag = any(strcmp(args.pnames,'Om2'));
+        assert(flag, 'Om2 should include as a system parameter');
+        Om2idx = find(strcmp(args.pnames(:),'Om2'));
+        data.Om2idx = Om2idx;
+    case 2
+        flag = any(strcmp(args.pnames,'Om1')) && any(strcmp(args.pnames,'Om2'));
+        assert(flag, 'Om1 and Om2 should include as a system parameter');
+        Om1idx = find(strcmp(args.pnames(:),'Om1'));
+        Om2idx = find(strcmp(args.pnames(:),'Om2'));
+        data.Om1idx = Om1idx;
+        data.Om2idx = Om2idx;
+end
 data.pnames  = args.pnames;
-Omidx = find(strcmp(args.pnames(:),'om_ext'));
-data.Omidx = Omidx; 
-% data = coco_func_data(data);
 
 end

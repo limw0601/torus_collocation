@@ -1,4 +1,4 @@
-function data = tor_get_settings(prob, tbid, data)
+function data = tor_get_settings(prob, tbid)
 %TOR_GET_SETTINGS   Read 'tor' toolbox instance settings.
 %
 % Merge user-supplied toolbox settings with default values.
@@ -13,14 +13,13 @@ function data = tor_get_settings(prob, tbid, data)
 % $Id: coll_get_settings.m 2839 2015-03-05 17:09:01Z fschild $
 
 defaults.autonomous = false;
-defaults.ODEsolver = @ode45; % use ode45 by default and define solver options
-defaults.ode_opts  = odeset('RelTol', 1.0e-8, 'AbsTol', 1.0e-10, 'NormControl', 'on');
+defaults.nOmega = 1; % number of frequency components
 
 copts = coco_get(prob, tbid);
 copts = coco_merge(defaults, copts);
 
-data.ode_opts  = copts.ode_opts;
-data.ODEsolver = copts.ODEsolver;
+data = struct();
 data.autonomous = copts.autonomous;
+data.nOmega = copts.nOmega;
 
 end

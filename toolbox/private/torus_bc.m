@@ -5,8 +5,8 @@ function fbc = torus_bc(data, T0, T, x0, x1, p)
 % map corresponds to identical times-of-flight and describes a rigid
 % rotation.
 
-Om = p(data.Omidx);
-om = p(end-1);
+om1    = p(end-2);
+om2    = p(end-1);
 varrho = p(end);
 Th  = (1:data.N)*2*pi*varrho;
 SIN = [ zeros(size(Th)) ; sin(Th) ];
@@ -14,7 +14,39 @@ R   = diag([1 kron(cos(Th), [1 1])]);
 R   = R  + diag(SIN(:), +1)- diag(SIN(:), -1);
 RF  = kron(R*data.Fs, eye(data.dim));
 
-fbc = [T0; T-2*pi/Om; data.F*x1-RF*x0; om-varrho*Om; x0(2)];
+fbc1 = [T0; T-2*pi/om2; data.F*x1-RF*x0; om1-varrho*om2];
+switch data.nOmega
+    case 0
+        error('not supported yet for the case without external forcing');
+        phase1 = 0;
+        phase2 = 0;
+        fbc2   = [phase1; phase2];
+        
+    case 1
+        Om2 = p(data.Om2idx);
+        par_coup = Om2-om2;
+%         phase    = x0(2); % a phase condition which is not general
+        % Poincare condition: <v^ast_\phi, v(0,0)-v^\ast>=0 
+        % Here v(0,0) is the evaluation of the first segment at t=0. v^\ast
+        % is the same evaluation at the solution of previous continuation
+        % step.
+        phase = data.f00'*(x0(1:data.dim)-data.x00);
+        fbc2  = [par_coup; phase];
+        
+    case 2
+        Om1 = p(data.Om1idx);
+        Om2 = p(data.Om2idx);
+        par_coup = [Om1-om1; Om2-om2];
+        fbc2     = par_coup;        
+        
+    otherwise
+        error('The number of external frequency components: {1,2,3}');
+        
+end
+
+fbc = [fbc1; fbc2];
+
+
 
 % nt = numel(T);
 % nx = numel(x0);

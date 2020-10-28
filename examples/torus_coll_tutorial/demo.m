@@ -46,20 +46,20 @@ varrho = 1/1.51111;
 prob = coco_prob();
 prob = coco_set(prob, 'ode', 'autonomous', false);
 prob = coco_set(prob, 'coll', 'NTST', 20);
-prob = coco_set(prob, 'cont', 'NAdapt', 1, 'h_max', 10);
-torargs = {@torus @torus_DFDX @torus_DFDP @torus_DFDT tau up {'om_ext','Om','om_int','varrho'} [om Om Om varrho]};
+prob = coco_set(prob, 'cont', 'NAdapt', 10, 'h_max', 10, 'NSV', 1);
+torargs = {@torus @torus_DFDX @torus_DFDP @torus_DFDT tau up {'Om2','Om','om1','om2','varrho'} [om Om Om om varrho]};
 prob = ode_isol2tor(prob, '', torargs{:});
 
 fprintf('\n Run=''%s'': Continue family of quasiperiodic invariant tori.\n', ...
   'torus');
 
-coco(prob, 'torus', [], 1, {'om_ext' 'Om' 'om_int' 'varrho'}, [0.5 1.5]);
+coco(prob, 'torus', [], 1, {'Om2' 'om2' 'om1' 'Om' 'varrho'}, [0.5 1.5]);
 
 %% Graphical representation of stored solutions
 
 % Figure 1
 figure(1); clf
-coco_plot_bd('torus', 'om_ext', 'Om')
+coco_plot_bd('torus', 'om1', 'om2')
 grid on
 
 % Plot data: panels (b)-(f)
@@ -69,7 +69,7 @@ labs = coco_bd_labs(bd);
 for i=1:numel(labs)
   figure(i+1); clf; hold on; grid on
   
-  [sol, data] = bvp_read_solution('', 'torus', labs(i));
+  [sol, data] = bvp_read_solution('tor', 'torus', labs(i));
   N  = data.nsegs;
   M  = size(sol{1}.xbp,1);
   x0 = zeros(N+1,2);

@@ -44,8 +44,8 @@ opts_spec = {
 assert(numel(args.p0)==numel(args.pnames) || isempty(args.pnames), ...
   '%s: incompatible number of elements for ''p0'' and ''pnames''', ...
   tbid);
-% data = tor_get_settings(prob, tbid, data);       % Get toolbox settings
-data = tor_init_data(args);                      % Build toolbox data
+data = tor_get_settings(prob, tbid);       % Get toolbox settings
+data = tor_init_data(args, data);          % Build toolbox data
 
 N = data.N;
 coll = cell(1,2*N+1);
@@ -64,7 +64,11 @@ end
 % prob = coco_set(prob, 'ode', 'autonomous', false);
 % prob = coco_set(prob, 'coll', 'NTST', 20);
 % prob = coco_set(prob, 'cont', 'NAdapt', 1, 'h_max', 10);
-prob = ode_isol2bvp(prob, '', coll, args.pnames, @torus_bc, data);
+xinit = args.x0(1,:,:);
+xinit = xinit(:);
+data  = torus_bc_update(data, [], [], xinit, [], []);
+prob  = ode_isol2bvp(prob, tbid, coll, args.pnames, @torus_bc,...
+    data, @torus_bc_update);
 
 
 
