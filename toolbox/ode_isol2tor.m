@@ -66,7 +66,8 @@ end
 % prob = coco_set(prob, 'cont', 'NAdapt', 1, 'h_max', 10);
 xinit = args.x0(1,:,:);
 xinit = xinit(:);
-data  = torus_bc_update(data, [], [], xinit, [], []);
+data  = torus_bc_update(data, t0(1), [], xinit, [], p0(:));
+prob  = coco_set(prob, coco_get_id(tbid,'ode'), 'autonomous', false);
 prob  = ode_isol2bvp(prob, tbid, coll, args.pnames, @torus_bc,...
     data, @torus_bc_update);
 

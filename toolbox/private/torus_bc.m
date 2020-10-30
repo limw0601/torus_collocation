@@ -17,9 +17,8 @@ RF  = kron(R*data.Fs, eye(data.dim));
 fbc1 = [T0; T-2*pi/om2; data.F*x1-RF*x0; om1-varrho*om2];
 switch data.nOmega
     case 0
-        error('not supported yet for the case without external forcing');
-        phase1 = 0;
-        phase2 = 0;
+        phase1 = data.f00'*(x0(1:data.dim)-data.x00);
+        phase2 = data.f0'*(x0(1:data.dim)-data.x0);
         fbc2   = [phase1; phase2];
         
     case 1
