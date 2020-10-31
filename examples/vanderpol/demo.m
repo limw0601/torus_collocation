@@ -12,10 +12,6 @@
 % circle. The rigid rotation imposes an all-to-all coupled system of
 % boundary conditions on the collection of trajectory segments.
 
-% Panel (a) shows a quasiperiodic arc, representing a family of
-% quasiperiodic invariant tori. Selected members of this family are shown
-% in panels (b) to (f).
-
 %% Encoding
 
 % Construct the guess of initial solution
