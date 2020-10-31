@@ -18,15 +18,7 @@
 % family are shown in panels (b) to (f).
 
 %% Encoding
-
-% The continuation problem structure encoded below includes two monitor
-% functions that evaluate to the problem parameters, and two corresponding
-% inactive continuation parameters 'Om' and 'om'. Its dimensional deficit
-% equals -1. The call to the coco entry-point function indicates a desired
-% manifold dimension of 1. To this end, both continuation parameters are
-% released and allowed to vary during continuation.
-
-% Construct 'coll' arguments
+% construct the guess of initial solution
 om   = 1.5;
 Om   = 1;
 N    = 15;  % 2N+1 = Number of orbit segments
@@ -38,15 +30,12 @@ for i=1:2*N+1
   up(:,:,i) = repmat(rho, [1 2]).*[cos(Om*tau+vphi(i)) sin(Om*tau+vphi(i))];
 end
 
-% Construct boundary conditions data, Fourier transform and rotation matrix
 varrho = 1/1.51111;
-% Use the 'F+dF' option of the ode_isol2bvp constructor, since @torus_bc
-% evaluates both the residual of the boundary conditions and the
-% corresponding Jacobian.
+
+% construct continuation problem
 prob = coco_prob();
-prob = coco_set(prob, 'ode', 'autonomous', false);
 prob = coco_set(prob, 'coll', 'NTST', 20);
-prob = coco_set(prob, 'cont', 'NAdapt', 10, 'h_max', 10, 'NSV', 1);
+prob = coco_set(prob, 'cont', 'NAdapt', 2, 'h_max', 10);
 torargs = {@torus @torus_DFDX @torus_DFDP @torus_DFDT tau up {'Om2','Om','om1','om2','varrho'} [om Om Om om varrho]};
 prob = ode_isol2tor(prob, '', torargs{:});
 
@@ -62,14 +51,26 @@ figure(1); clf
 coco_plot_bd('torus', 'om1', 'om2')
 grid on
 
-% Plot data: panels (b)-(f)
-bd = coco_bd_read('torus');
+
+%% New run with varied varrho
+lab  = 1;
+prob = coco_prob();
+prob = coco_set(prob, 'cont', 'NAdapt', 2, 'h_max', 10);
+prob = ode_tor2tor(prob, '', 'torus', lab);
+coco(prob, 'torus_varrho', [], 1, {'Om2' 'om2' 'varrho' 'Om' 'om1'}, [0.5 1.5]);
+
+% Figure 2
+figure(2); clf
+coco_plot_bd('torus_varrho', 'varrho', 'om2')
+grid on
+
+bd = coco_bd_read('torus_varrho');
 labs = coco_bd_labs(bd);
 
 for i=1:numel(labs)
   figure(i+1); clf; hold on; grid on
   
-  [sol, data] = bvp_read_solution('tor', 'torus', labs(i));
+  [sol, data] = bvp_read_solution('tor', 'torus_varrho', labs(i));
   N  = data.nsegs;
   M  = size(sol{1}.xbp,1);
   x0 = zeros(N+1,2);
@@ -91,7 +92,7 @@ for i=1:numel(labs)
   plot3(x0(:,1), zeros(N+1,1), x0(:,2), 'LineStyle', '-', 'LineWidth', 2, ...
     'Color', 'black', 'Marker', '.', 'MarkerSize', 12);
   plot3(x1(:,1), sol{n}.T*ones(N+1,1), x1(:,2), 'LineStyle', '-', 'LineWidth', 2, ...
-    'Color', 'black', 'Marker', '.', 'MarkerSize', 12);
+    'Color', 'blue', 'Marker', '.', 'MarkerSize', 12);
   
   hold off; view([50 15])
 end

@@ -42,7 +42,7 @@ varrho = T_ret/T_po;
 prob = coco_prob();
 prob = coco_set(prob, 'tor', 'autonomous', true, 'nOmega', 0);
 prob = coco_set(prob, 'coll', 'MXCL', false);
-prob = coco_set(prob, 'cont', 'NAdapt', 0, 'h_max', 10, 'PtMX', 50);
+prob = coco_set(prob, 'cont', 'NAdapt', 0, 'h_max', 10, 'PtMX', 40);
 torargs = {@lang @lang_DFDX @lang_DFDP t1 xinit {'om','rho','eps','om1','om2','varrho'} [p0' 2*pi/T_po p0(1) varrho]};
 % we choose negative om1 above because the rotation direction is opposite.
 % In other words, the value of om1 can be both positive and negative
@@ -50,22 +50,39 @@ prob = ode_isol2tor(prob, '', torargs{:});
 
 fprintf('\n Run=''%s'': Continue family of quasiperiodic invariant tori.\n', ...
   'torus');
-
 coco(prob, 'run_eps', [], 1, {'eps','rho','om1','om2','om','varrho'}, [-0.3 0.3]);
 
+%% new run from previous solution - varying varrho
+bd  = coco_bd_read('run_eps');
+lab = coco_bd_labs(bd, 'EP');
+lab = max(lab);
+prob = coco_prob();
+prob = coco_set(prob, 'coll', 'MXCL', false);
+prob = coco_set(prob, 'cont', 'NAdapt', 0, 'h_max', 10, 'PtMX', 50);
+prob = ode_tor2tor(prob, '', 'run_eps', lab);
+fprintf('\n Run=''%s'': Continue family of quasiperiodic invariant tori.\n', ...
+  'run_oms');
+coco(prob, 'run_oms', [], 1, {'om1','varrho','om','om2','eps','rho'}, [1 2]);
 
-% prob = coco_prob();
-% prob = msbvp_isol2segs(prob, '', coll_args{:}, ...
-%   {'om' 'ro' 'eps' 'T_ret'}, @torus_bc, @torus_bc_DFDX, data);
-% coco(prob, 'run0', [], 0, {'ro' 'T_ret'}); % compute initial torus
-% prob = msbvp_sol2segs(coco_prob(), '', 'run0', 1);
+%% switch to secondary branch via branch-switching
+bd  = coco_bd_read('run_oms');
+lab = coco_bd_labs(bd, 'BP');
+lab = min(lab);
+prob = coco_prob();
+prob = coco_set(prob, 'cont', 'NAdapt', 0, 'h_max', 10, 'PtMX', 30);
+prob = ode_BP2tor(prob, '', 'run_oms', lab);
 
-% run continuation along quasiperiodic arc
-% coco(prob, 'run_eps', [], 1, {'eps' 'ro' 'T_ret'}, [-0.3 0.3]);
+fprintf('\n Run=''%s'': Continue family of quasiperiodic invariant tori.\n', ...
+  'run_oms_BP');
 
-% Use the following command to perform continuation of relative periodic
-% orbits of symmetric system. 
-%
-% coco(prob, 'run_ro', [], 1, {'ro' 'om' 'T_ret'}, [0 1]);
+coco(prob, 'run_oms_BP', [], 1, {'om1','varrho','om','om2','eps','rho'}, [1 2]);
 
-% coco_use_recipes_toolbox % remove the coll_v1 and msbvp_v1 toolboxes from the search path
+%% plot results
+% continuation path
+figure; hold 
+coco_plot_bd('run_oms', 'om1', 'varrho');hold on
+coco_plot_bd('run_oms_BP', 'om1', 'varrho'); % secondary branch
+grid on
+
+% torus
+plot_torus('','run_oms_BP', 1, 1);
