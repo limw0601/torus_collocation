@@ -4,7 +4,7 @@ function prob = ode_BP2tor(prob, oid, varargin)
 % Support restarting continuation from a previously obtained solution,
 % stored to disk.
 %
-% PROB     = ODE_TOR2TOR(PROB, OID, VARARGIN)
+% PROB     = ODE_BP2TOR(PROB, OID, VARARGIN)
 % VARARGIN = { RUN [SOID] LAB }
 %
 % PROB - Continuation problem structure.
@@ -22,14 +22,10 @@ run  = str.get;
 if ischar(str.peek)
   soid = str.get;
 else
-  soid = oid;
+  soid = tbid;
 end
 lab = str.get;
-        
-[sol,data] = tor_read_solution(soid, run, lab, 'BP');  % Extract solution and toolbox data from disk
-data       = tor_get_settings(prob, tbid, data);  % Get toolbox settings
-data       = tor_init_data(data, sol.x0, sol.p);  % Build toolbox data
-sol        = tor_init_sol(sol.T0, sol.T, sol.x0, sol.x1, sol.p, sol.t0);  % Build initial solution guess
-prob       = ode_construct_tor(prob, tbid, data, sol); % Append continuation problem
+
+prob = ode_BP2bvp(prob, tbid, run, soid, lab); % Append continuation problem
 
 end

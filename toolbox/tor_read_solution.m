@@ -1,41 +1,55 @@
-function [sol, data] = tor_read_solution(oid, run, lab, varargin)
+function [sols, data] = tor_read_solution(oid, run, lab)
 %TOR_READ_SOLUTION   Read 'tor' solution and toolbox data from disk.
 %
 % Extract data and chart structures associated with 'tor' toolbox instance
 % identifier from solution file and construct solution structure.
 %
-% [SOL DATA] = TOR_READ_SOLUTION(OID, RUN, LAB, VARARGIN)
-% VARARGIN = { [BRANCH_TYPE] }
+% [SOL DATA] = TOR_READ_SOLUTION(OID, RUN, LAB)
 %
 % SOL  - Solution (struct).
 % DATA - Toolbox data (struct).
 % OID  - Object instance identifier (string).
 % RUN  - Run identifier (string).
 % LAB  - Solution label (integer).
-% BRANCH_TYPE - Branch type ('BP').
-
 
 tbid   = coco_get_id(oid, 'tor');
-sol.t0 = [];
-
-if ~isempty(varargin) && strcmp(varargin{1},'BP')
-    [data, chart, uidx] = coco_read_solution(tbid, run, lab, 'data', ...
-        'chart', 'uidx');
-    cdata = coco_get_chart_data(chart, 'lsol');
-    if isempty(cdata)
-      coco_warn([], 1, 1, ...
-        'Could not find restart data for branch-switching\n');
-    else
-      sol.t0 = cdata.v(uidx);
+[sol, data] = bvp_read_solution(tbid, run, lab);
+N  = data.nsegs;
+% set unified time mesh for all segments
+tbp = sol{1}.tbp;
+assert(abs(tbp(1))<1e-4,'initial time is not zero');
+flags = false(N,1);
+for j=1:N
+    n  = mod(j-1,N)+1;
+    tj = sol{n}.tbp;
+    assert(abs(tj(1))<1e-4,'initial time is not zero');
+    assert(abs(tj(end)-tbp(end))<1e-3*abs(tj(end)),'final time is not matched in segments of torus');
+    if numel(tj)==numel(tbp)
+        flags(j) = norm(tj-tbp)<1e-3*norm(tbp);
     end
-else
-    [data, chart] = coco_read_solution(tbid, run, lab, 'data', 'chart');
+    if numel(tj)>numel(tbp)
+        tbp = tj; % pick the time mesh with most points
+    end
 end
 
-sol.T0 = chart.x(data.T0_idx);
-sol.T  = chart.x(data.T_idx);
-sol.x0 = chart.x(data.x0_idx);
-sol.x1 = chart.x(data.x1_idx);
-sol.p  = chart.x(data.p_idx);  
+sameMesh = all(flags);
+
+% interpolation of trajectories at the unified mesh
+nt  = numel(tbp);
+xbp = zeros(nt, data.bc_data.dim, N+1);
+for j=1:N+1
+    n    = mod(j-1,N)+1; % the last one is the same as the first one for torus plotting
+    tbpj = sol{n}.tbp;
+    xbpj = sol{n}.xbp;
+    if ~sameMesh
+        xbpj = interp1(tbpj, xbpj, tbp, 'pchip');
+    end
+    xbp(:,:,j) = xbpj;
+end
+
+% write output
+sols = struct();
+sols.tbp = tbp;
+sols.xbp = xbp;
 
 end
