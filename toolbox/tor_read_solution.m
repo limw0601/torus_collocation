@@ -51,5 +51,6 @@ end
 sols = struct();
 sols.tbp = tbp;
 sols.xbp = xbp;
+sols.p   = sol{1}.p;
 
 end
