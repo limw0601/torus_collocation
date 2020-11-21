@@ -4,15 +4,10 @@ function tor_arg_check(tbid, data)
 % Validate user-supplied inputs and terminate execution with suitable error
 % messages if the inputs fail to be of the correct type.
 %
-% TOR_ARG_CHECK(TBID, DATA, T0, X0, X1, P0)
+% TOR_ARG_CHECK(TBID, DATA)
 %
 % TBID - Toolbox instance identifier.
 % DATA - Toolbox data structure.
-% T0   - Initial time.
-% T    - Time period
-% X0   - Initial state.
-% X1   - Final state
-% P0   - Initial solution guess for problem parameters.
 
 assert(isa(data.fhan, 'function_handle'), ...
   '%s: input for ''f'' is not a function handle', tbid);

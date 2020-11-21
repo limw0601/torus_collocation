@@ -4,11 +4,10 @@ function data = tor_init_data(args,data)
 % Populate remaining fields of the toolbox data structure used by 'tor'
 % function objects.
 %
-% DATA = TOR_INIT_DATA(DATA, X0, P0)
+% DATA = TOR_INIT_DATA(ARGS,DATA)
 %
+% ARGS - Arguments.
 % DATA - Toolbox data structure.
-% X0   - Initial solution guess initial states.
-% P0   - Initial solution guess for problem parameters.
 
 [~,dim,nsegs] = size(args.x0);
 assert(mod(nsegs,2)==1, 'the number of segments is not an odd number');

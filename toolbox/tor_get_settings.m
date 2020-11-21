@@ -3,14 +3,13 @@ function data = tor_get_settings(prob, tbid)
 %
 % Merge user-supplied toolbox settings with default values.
 %
-% DATA = COLL_GET_SETTINGS(PROB, TBID, DATA)
+% DATA = COLL_GET_SETTINGS(PROB, TBID)
 %
 % PROB - Continuation problem structure.
 % TBID - Toolbox instance identifier.
 % DATA - Toolbox data strcture.
 
-% Copyright (C) Frank Schilder, Harry Dankowicz
-% $Id: coll_get_settings.m 2839 2015-03-05 17:09:01Z fschild $
+% Copyright (C) MINGWU LI
 
 defaults.autonomous = false;
 defaults.nOmega = 1; % number of frequency components

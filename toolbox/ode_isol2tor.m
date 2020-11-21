@@ -4,18 +4,17 @@ function prob = ode_isol2tor(prob, oid, varargin)
 % Parse input sequence to construct toolbox data and initial solution guess
 % and use this to construct an instance of 'tor'.
 %
-% PROB     = ODE_ISOL2TOR(PROB, OID, @F @DFDX @DFDP T0 T X0 X1 PNAMES P0)
-% VARARGIN = { @DFDT|[], @DFDXDX|[], @DFDXDP|[], @DFDPDP|[] }
+% PROB     = ODE_ISOL2TOR(PROB, OID, VARARGIN)
+% VARARGIN = { @F [@DFDX [@DFDP [@DFDT]]] T0 X0 [PNAMES] P0 }
 %
 % PROB   - Continuation problem structure.
 % OID    - Object instance identifier (string).
 % @F     - Function handle to vector field.
 % @DFDX  - Optional function handle to Jacobian w.r.t. problem variables.
 % @DFDP  - Optional function handle to Jacobian w.r.t. problem parameters.
-% T0     - Initial time.
-% T      - Time period.
-% X0     - Initial state.
-% X1     - Final state.
+% @DFDT  - Optional function handle to Jacobian w.r.t. time.
+% T0     : Initial time discretization.
+% X0     : Initial sampled time history for state variables.
 % PNAMES - Optional string label or cell array of string labels for
 %          continuation parameters tracking problem parameters.
 % P0     - Initial solution guess for problem parameters.

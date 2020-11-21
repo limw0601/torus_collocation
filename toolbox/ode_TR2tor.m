@@ -3,6 +3,7 @@ function prob = ode_TR2tor(prob, oid, varargin)
 %
 % PROB = ODE_TR2tor(PROB, OID, VARARGIN)
 % VARARGIN = { RUN [SOID] LAB [OPTS] }
+% OPTS = [NSEG], [ROT [EPS]]
 %
 % Start a continuation of quasiperiodic orbits emanating from a torus bifurcation
 % that was obtained and saved to dis in a previous continuation along a
@@ -18,6 +19,9 @@ function prob = ode_TR2tor(prob, oid, varargin)
 % RUN  : Run identifier (string or cell-array of strings).
 % SOID : Source object instance identifier (string, optional).
 % LAB  : Solution label (integer).
+% NSEG : Number of segments in discretization (2NSEG+1), 10 by default.
+% ROT  : Direction of rotation: pos | neg, pos by default
+% EPS  : Amount of peturbation, 1e-4 by default
 % 
 % See also: ODE_TOR2TOR, TOR_READ_SOLUTION
 

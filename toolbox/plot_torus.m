@@ -1,9 +1,18 @@
 function plot_torus(toid, run, lab, outdof, varargin)
-% Plot torus
-% toid - the instance of torus, a typical used one is ''
-% run  - the id of run
-% lab  - the label of solution
-% fac  - fraction of plot
+% PLOT_TORUS This function plots torus characterized by outdof
+%
+% PLOT_TORUS(TOID, RUN, LAB, OUTDOF, VARARGIN)
+% VARARGIN = [FAC]
+%
+% toid   - the instance of torus, a typical used one is ''
+% run    - the id of run
+% lab    - the label of solution
+% outdof - dofs for torus plotting. If the number of dofs is two, the plot
+%          of dof1-time-dof2 will be given. If the number of dofs is three,
+%          the plot of dof1-dof2-dof3 will be given
+% fac    - fraction of torus plot
+%
+% See also: TOR_READ_SOLUTION
 
 if nargin<5
     fac= 1;

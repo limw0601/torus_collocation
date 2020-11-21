@@ -4,6 +4,7 @@ function fbc = torus_bc(data, T0, T, x0, x1, p)
 % Trajectory end points lie on a curve on the invariant torus. The return
 % map corresponds to identical times-of-flight and describes a rigid
 % rotation.
+% Appropriate phase conditions are imposed as well to yield unique solution
 
 om1    = p(end-2);
 om2    = p(end-1);
