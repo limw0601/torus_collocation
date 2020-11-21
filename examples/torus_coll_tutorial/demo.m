@@ -1,21 +1,6 @@
 %% Continuation of quasiperiodic invariant tori
 %
-% Two-dimensional quasiperiodic invariant tori are characterized by a
-% parallel flow with irrational rotation number. In terms of a suitably
-% defined torus function, the dynamics on the torus may be described by an
-% invariant circle that is mapped to itself by the flow, such that the flow
-% is equivalent to a rigid rotation on the circle.
-%
-% We obtain an approximate description of a quasiperiodic invariant torus
-% in terms of a Fourier representation of the invariant circle and a finite
-% collection of trajectory segments based at points on the invariant
-% circle. The rigid rotation imposes an all-to-all coupled system of
-% boundary conditions on the collection of trajectory segments.
-
-% Panel (a) shows a quasiperiodic arc, representing a family of
-% quasiperiodic invariant tori. The slope of the arc is the rotation number
-% which is held constant during continuation. Selected members of this
-% family are shown in panels (b) to (f).
+% This demo reproduce the torus demo studied in torus/examples/coll
 
 %% Encoding
 % construct the guess of initial solution
