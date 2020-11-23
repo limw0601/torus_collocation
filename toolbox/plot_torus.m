@@ -2,7 +2,7 @@ function plot_torus(toid, run, lab, outdof, varargin)
 % PLOT_TORUS This function plots torus characterized by outdof
 %
 % PLOT_TORUS(TOID, RUN, LAB, OUTDOF, VARARGIN)
-% VARARGIN = [FAC]
+% VARARGIN = [FAC], [AXLABS]
 %
 % toid   - the instance of torus, a typical used one is ''
 % run    - the id of run
@@ -11,13 +11,23 @@ function plot_torus(toid, run, lab, outdof, varargin)
 %          of dof1-time-dof2 will be given. If the number of dofs is three,
 %          the plot of dof1-dof2-dof3 will be given
 % fac    - fraction of torus plot
+% axLabs - {xlabel,zlabel} or {xlabel,ylabel,zlabel}
 %
 % See also: TOR_READ_SOLUTION
 
+labels = [];
 if nargin<5
     fac= 1;
 else
-    fac = varargin{1};
+    if isnumeric(varargin{1})
+        fac = varargin{1};
+        if nargin==6
+            labels = varargin{2};
+        end
+    else
+        fac = 1;
+        labels = varargin{1};
+    end
 end
 
 ndof = numel(outdof);
@@ -43,9 +53,16 @@ if ndof<3
     plot3(tube(end,:,outdof(1)), tbp(end)*ones(nsegs,1), tube(end,:,outdof(2)), 'LineStyle', '-', 'LineWidth', 2, ...
         'Color', 'blue', 'Marker', '.', 'MarkerSize', 12);
     view([50 15]); grid on
-    xlabel(['$x_\mathrm{',num2str(outdof(1)),'}$'],'interpreter','latex','FontSize',14);
     ylabel('$t$','interpreter','latex','FontSize',14);
-    zlabel(['$x_\mathrm{',num2str(outdof(2)),'}$'],'interpreter','latex','FontSize',14);
+    if isempty(labels)
+        xlab = ['$x_\mathrm{',num2str(outdof(1)),'}$'];
+        zlab = ['$x_\mathrm{',num2str(outdof(2)),'}$'];
+    else
+        xlab = labels{1};
+        zlab = labels{2};
+    end
+    xlabel(xlab,'interpreter','latex','FontSize',14);
+    zlabel(zlab,'interpreter','latex','FontSize',14);
     title(['$\omega_1=',num2str(sol.p(end-2)),', \omega_2=',num2str(sol.p(end-1)),'$'],...
         'interpreter','latex','FontSize',14);
     hold off
@@ -60,9 +77,18 @@ else
     plot3(tube(end,:,outdof(1)), tube(end,:,outdof(2)), tube(end,:,outdof(3)), 'LineStyle', '-', 'LineWidth', 2, ...
         'Color', 'blue', 'Marker', '.', 'MarkerSize', 12);
     view([50 15]); grid on
-    xlabel(['$x_\mathrm{',num2str(outdof(1)),'}$'],'interpreter','latex','FontSize',14);
-    ylabel(['$x_\mathrm{',num2str(outdof(2)),'}$'],'interpreter','latex','FontSize',14);
-    zlabel(['$x_\mathrm{',num2str(outdof(3)),'}$'],'interpreter','latex','FontSize',14);
+    if isempty(labels)
+        xlab = ['$x_\mathrm{',num2str(outdof(1)),'}$'];
+        ylab = ['$x_\mathrm{',num2str(outdof(2)),'}$'];
+        zlab = ['$x_\mathrm{',num2str(outdof(3)),'}$'];
+    else
+        xlab = labels{1};
+        ylab = labels{2};
+        zlab = labels{3};
+    end
+    xlabel(xlab,'interpreter','latex','FontSize',14);
+    ylabel(ylab,'interpreter','latex','FontSize',14);
+    zlabel(zlab,'interpreter','latex','FontSize',14);
     title(['$\omega_1=',num2str(sol.p(end-2)),', \omega_2=',num2str(sol.p(end-1)),'$'],...
         'interpreter','latex','FontSize',14);
     hold off
