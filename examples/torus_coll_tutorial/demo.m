@@ -19,6 +19,7 @@ varrho = 1/1.51111;
 
 % construct continuation problem
 prob = coco_prob();
+prob = coco_set(prob, 'tor', 'autonomous', false);
 prob = coco_set(prob, 'coll', 'NTST', 20);
 prob = coco_set(prob, 'cont', 'NAdapt', 2, 'h_max', 10);
 torargs = {@torus @torus_DFDX @torus_DFDP @torus_DFDT tau up {'Om2','Om','om1','om2','varrho'} [om Om Om om varrho]};
