@@ -40,7 +40,6 @@ varrho = T_ret/T_po;
 
 % construct continuation problem
 prob = coco_prob();
-prob = coco_set(prob, 'tor', 'autonomous', true, 'nOmega', 0);
 prob = coco_set(prob, 'coll', 'MXCL', false);
 prob = coco_set(prob, 'cont', 'NAdapt', 0, 'h_max', 10, 'PtMX', 40);
 torargs = {@lang @lang_DFDX @lang_DFDP t1 xinit {'om','rho','eps','om1','om2','varrho'} [p0' 2*pi/T_po p0(1) varrho]};
@@ -79,10 +78,13 @@ coco(prob, 'run_oms_BP', [], 1, {'om1','varrho','om','om2','eps','rho'}, [1 2]);
 
 %% plot results
 % continuation path
+figure;
+coco_plot_bd('run_eps', 'rho', 'eps');hold on
+
 figure; hold 
 coco_plot_bd('run_oms', 'om1', 'varrho');hold on
 coco_plot_bd('run_oms_BP', 'om1', 'varrho'); % secondary branch
 grid on
 
 % torus
-plot_torus('','run_oms_BP', 1, 1);
+plot_torus('','run_oms_BP', 1, [1 2 3]);

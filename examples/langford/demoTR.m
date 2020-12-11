@@ -22,7 +22,6 @@ varrho = T_ret/T_po;
 bd    = coco_bd_read('po');
 TRlab = coco_bd_labs(bd, 'TR');
 prob = coco_prob();
-prob = coco_set(prob, 'tor', 'autonomous', true, 'nOmega', 0);
 prob = coco_set(prob, 'cont', 'NAdapt', 5, 'h_min',...
     1e-3, 'PtMX', 50, 'h_max', 10, 'bi_direct', false);
 prob = ode_TR2tor(prob, '', 'po', TRlab, 50);
