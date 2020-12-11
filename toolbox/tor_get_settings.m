@@ -11,14 +11,12 @@ function data = tor_get_settings(prob, tbid)
 
 % Copyright (C) MINGWU LI
 
-defaults.autonomous = false;
-defaults.nOmega = 1; % number of frequency components
+defaults.autonomous = true;
 
 copts = coco_get(prob, tbid);
 copts = coco_merge(defaults, copts);
 
 data = struct();
 data.autonomous = copts.autonomous;
-data.nOmega = copts.nOmega;
 
 end

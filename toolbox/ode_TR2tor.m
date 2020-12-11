@@ -105,8 +105,10 @@ varrho = om1/om2;
 
 % traj for om1
 th1  = ((1:2*N+1)-1)*2*pi/(2*N+1);
-cth1 = cos(th1+om1*t0);
-sth1 = sin(th1+om1*t0);
+cth1 = cos(th1+om1*(t0-t0(1)));
+sth1 = sin(th1+om1*(t0-t0(1)));
+% cth1 = repmat(cos(th1),[numel(t0),1]);
+% sth1 = repmat(sin(th1),[numel(t0),1]);
 
 % traj for om2
 dim  = fdata.coll_seg.int.dim;
@@ -145,9 +147,21 @@ end
 
 p0 = sol.p;
 
+% extract NTST and NCOL such that initial solution guess is acutally a
+% solution
+collid = coco_get_id(args.soid, 'po.orb.coll');
+colldata = coco_read_solution(collid, args.run, args.lab, 'data');
+NTST = colldata.coll_seg.maps.NTST;
+NCOL = colldata.coll_seg.int.NCOL;
+prob = coco_set(prob, 'coll', 'NTST', NTST, 'NCOL', NCOL);
+
 torargs = {fdata.fhan fdata.dfdxhan fdata.dfdphan fdata.dfdthan...
     t0 x0 [fdata.pnames(:)',{'om1'},{'om2'},{'varrho'}]...
     [p0' om1 om2 varrho]};
 prob = ode_isol2tor(prob, oid, torargs{:});
+% poargs = {fdata.fhan fdata.dfdxhan fdata.dfdphan fdata.dfdthan...
+%     t0 xbp fdata.pnames p0};
+% prob  = coco_set(prob, coco_get_id(oid,'ode'), 'autonomous', false);
+% prob = ode_isol2po(prob, oid, poargs{:});
 
 end

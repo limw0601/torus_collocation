@@ -55,23 +55,11 @@ for i=1:2*N+1
   coll{i} = {data.fhan data.dfdxhan data.dfdphan data.dfdthan t0 x0 p0};
 end
 
-
-% Use the 'F+dF' option of the ode_isol2bvp constructor, since @torus_bc
-% evaluates both the residual of the boundary conditions and the
-% corresponding Jacobian.
-% prob = coco_prob();
-% prob = coco_set(prob, 'ode', 'autonomous', false);
-% prob = coco_set(prob, 'coll', 'NTST', 20);
-% prob = coco_set(prob, 'cont', 'NAdapt', 1, 'h_max', 10);
 xinit = args.x0(1,:,:);
 xinit = xinit(:);
 data  = torus_bc_update(data, t0(1), [], xinit, [], p0(:));
 prob  = coco_set(prob, coco_get_id(tbid,'ode'), 'autonomous', false);
-prob  = ode_isol2bvp(prob, tbid, coll, args.pnames, @torus_bc,...
-    data, @torus_bc_update);
-
-
-
-% prob = ode_construct_tor(prob, tbid, data, sol); % Append continuation problem
+prob  = ode_isol2bvp(prob, tbid, coll, args.pnames, @torus_bc, ...
+    @torus_bc_DFDX, data, @torus_bc_update);
 
 end

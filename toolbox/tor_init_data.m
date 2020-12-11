@@ -56,19 +56,11 @@ else
         data.dfdthan = @(t,x,p) args.dfdthan(t,x,p(1:end-3,:));
     end
 end
-switch data.nOmega
-    case 1
-        flag = any(strcmp(args.pnames,'Om2'));
-        assert(flag, 'Om2 should include as a system parameter');
-        Om2idx = find(strcmp(args.pnames(:),'Om2'));
-        data.Om2idx = Om2idx;
-    case 2
-        flag = any(strcmp(args.pnames,'Om1')) && any(strcmp(args.pnames,'Om2'));
-        assert(flag, 'Om1 and Om2 should include as a system parameter');
-        Om1idx = find(strcmp(args.pnames(:),'Om1'));
-        Om2idx = find(strcmp(args.pnames(:),'Om2'));
-        data.Om1idx = Om1idx;
-        data.Om2idx = Om2idx;
+if ~data.autonomous
+    flag = any(strcmp(args.pnames,'Om2'));
+    assert(flag, 'Om2 should include as a system parameter');
+    Om2idx = find(strcmp(args.pnames(:),'Om2'));
+    data.Om2idx = Om2idx;
 end
 data.pnames  = args.pnames;
 
