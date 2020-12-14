@@ -1,7 +1,8 @@
+%% construct initial periodic solution using forward simulation
 p0 = [3.5; 1.5; 0]; % [om ro eps]
 T  = 2*pi/p0(1);
-[~,x0] = ode45(@(t,x) lang(x,p0), 0:100*T, [0.3; 0.4; 0]); % Approximate periodic orbit of reduced system
-[t0,x0] = ode45(@(t,x) lang(x,p0), linspace(0,T,100), x0(end,:));
+[~,x0] = ode45(@(t,x) lang(x,p0), 0:100*T, [0.3; 0.4; 0]); % transient
+[t0,x0] = ode45(@(t,x) lang(x,p0), linspace(0,T,100), x0(end,:)); % approximated periodic solution
 figure;
 plot(t0,x0);
 
@@ -35,7 +36,6 @@ bd   = coco_bd_read('tr1');
 lab  = coco_bd_labs(bd, 'EP');
 lab  = max(lab);
 prob = coco_prob();
-prob = coco_set(prob, 'tor', 'autonomous', true, 'nOmega', 0);
 prob = coco_set(prob, 'cont', 'NAdapt', 5, 'h_min',...
     1e-3, 'PtMX', 30, 'h_max', 10, 'bi_direct', true);
 prob = ode_tor2tor(prob, '', 'tr1', lab);
