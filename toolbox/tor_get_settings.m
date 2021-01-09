@@ -12,11 +12,13 @@ function data = tor_get_settings(prob, tbid)
 % Copyright (C) MINGWU LI
 
 defaults.autonomous = true;
+defaults.Om2idx = [];
 
 copts = coco_get(prob, tbid);
 copts = coco_merge(defaults, copts);
 
 data = struct();
 data.autonomous = copts.autonomous;
+data.Om2idx = copts.Om2idx;
 
 end

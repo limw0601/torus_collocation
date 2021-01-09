@@ -56,9 +56,9 @@ else
         data.dfdthan = @(t,x,p) args.dfdthan(t,x,p(1:end-3,:));
     end
 end
-if ~data.autonomous
+if ~data.autonomous && isempty(data.Om2idx)
     flag = any(strcmp(args.pnames,'Om2'));
-    assert(flag, 'Om2 should include as a system parameter');
+    assert(flag, 'Om2 should include as a system parameter if its index is not specified');
     Om2idx = find(strcmp(args.pnames(:),'Om2'));
     data.Om2idx = Om2idx;
 end
