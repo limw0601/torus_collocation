@@ -34,24 +34,43 @@ ndof = numel(outdof);
 assert(ndof<4, 'visualization of 4 or higher dimensional torus is not supported');
 assert(ndof>1, 'the dimension of outdof should be larger than one');
 
-[sol, ~] = tor_read_solution(toid, run, lab);
-tube = sol.xbp; % [nt dim nsegs+1]
-[nt,~,nsegs] = size(tube);
+[sol, data] = tor_read_solution(toid, run, lab);
+Tube = sol.xbp; % [nt dim nsegs+1]
+nt   = size(Tube,1);
 M    = ceil(nt*fac);
-tube = permute(tube, [1,3,2]);
-tube = tube(1:M,:,:); % a fraction of torus
+Tube = permute(Tube, [1,3,2]);
+Tube = Tube(1:M,:,:); % a fraction of torus
+Tube = Tube(:,1:end-1,outdof);
+Nseg = size(Tube,2);
+% Fourier expansion to recover
+nsegs = 129; % 128+1
+angs  = linspace(0,2*pi,nsegs);
+tube  = Fourier_recover(permute(Tube,[2,1,3]), data.bc_data.Fs, angs);
+tube  = permute(tube, [2,1,3]);
 if ndof<3
     % plot of x1-t-x2
+    % recovered tube
     tbp = repmat(sol.tbp, [1,nsegs]);
     tbp = tbp(1:M,:);
     figure; hold on
-    surf(tube(:,:,outdof(1)), tbp, tube(:,:,outdof(2)), 'FaceAlpha', 0.7, ... %, 'FaceColor', 0.9*[1 1 1]
-        'MeshStyle', 'column', 'LineStyle', '-', 'EdgeColor', 0.6*[1 1 1], ...
-        'LineWidth', 0.5);
-    plot3(tube(1,:,outdof(1)), zeros(nsegs,1), tube(1,:,outdof(2)), 'LineStyle', '-', 'LineWidth', 2, ...
+    surf(tube(:,:,1), tbp, tube(:,:,2), 'FaceAlpha', 0.7, ... %, 'FaceColor', 0.9*[1 1 1]
+        'MeshStyle', 'column', 'LineStyle', '-', 'EdgeColor', 'none', ...
+        'LineWidth', 0.5); % 
+    plot3(tube(1,:,1), zeros(nsegs,1), tube(1,:,2), 'LineStyle', '-', 'LineWidth', 2, ...
+        'Color', 'black');
+    plot3(tube(end,:,1), tbp(end)*ones(nsegs,1), tube(end,:,2), 'LineStyle', '-', 'LineWidth', 2, ...
+        'Color', 'blue');
+    % trajectories at computed angles
+    tbp = repmat(sol.tbp, [1,Nseg]);
+    tbp = tbp(1:M,:);    
+    for i=1:Nseg
+        plot3(Tube(:,i,1), tbp, Tube(:,i,2), 'LineStyle', '-', ...
+            'Color', 0.6*[1 1 1], 'LineWidth', 0.5);
+    end
+    plot3(Tube(1,:,1), zeros(Nseg,1), Tube(1,:,2), 'LineWidth', 2, ...
         'Color', 'black', 'Marker', '.', 'MarkerSize', 12);
-    plot3(tube(end,:,outdof(1)), tbp(end)*ones(nsegs,1), tube(end,:,outdof(2)), 'LineStyle', '-', 'LineWidth', 2, ...
-        'Color', 'blue', 'Marker', '.', 'MarkerSize', 12);
+    plot3(Tube(end,:,1), tbp(end)*ones(Nseg,1), Tube(end,:,2), 'LineWidth', 2, ...
+        'Color', 'blue', 'Marker', '.', 'MarkerSize', 12);    
     view([50 15]); grid on
     ylabel('$t$','interpreter','latex','FontSize',14);
     if isempty(labels)
@@ -68,14 +87,24 @@ if ndof<3
     hold off
 else
     % plot of x1-x2-x3
+    % recovered tube
     figure; hold on
-    surf(tube(:,:,outdof(1)), tube(:,:,outdof(2)), tube(:,:,outdof(3)), 'FaceAlpha', 0.7, ... %, 'FaceColor', 0.9*[1 1 1]
-        'MeshStyle', 'column', 'LineStyle', '-', 'EdgeColor', 0.6*[1 1 1], ...
+    surf(tube(:,:,1), tube(:,:,2), tube(:,:,3), 'FaceAlpha', 0.7, ... %, 'FaceColor', 0.9*[1 1 1]
+        'MeshStyle', 'column', 'LineStyle', '-', 'EdgeColor', 'none', ...
         'LineWidth', 0.5);
-    plot3(tube(1,:,outdof(1)), tube(1,:,outdof(2)), tube(1,:,outdof(3)), 'LineStyle', '-', 'LineWidth', 2, ...
+    plot3(tube(1,:,1), tube(1,:,2), tube(1,:,3), 'LineStyle', '-', 'LineWidth', 2, ...
+        'Color', 'black');
+    plot3(tube(end,:,1), tube(end,:,2), tube(end,:,3), 'LineStyle', '-', 'LineWidth', 2, ...
+        'Color', 'blue');
+    % trajectories at computed angles
+    for i=1:Nseg
+        plot3(Tube(:,i,1), Tube(:,i,2), Tube(:,i,3), 'LineStyle', '-', ...
+            'Color', 0.6*[1 1 1], 'LineWidth', 0.5);
+    end
+    plot3(Tube(1,:,1), Tube(1,:,2), Tube(1,:,3), 'LineWidth', 2, ...
         'Color', 'black', 'Marker', '.', 'MarkerSize', 12);
-    plot3(tube(end,:,outdof(1)), tube(end,:,outdof(2)), tube(end,:,outdof(3)), 'LineStyle', '-', 'LineWidth', 2, ...
-        'Color', 'blue', 'Marker', '.', 'MarkerSize', 12);
+    plot3(Tube(end,:,1), Tube(end,:,2), Tube(end,:,3), 'LineWidth', 2, ...
+        'Color', 'blue', 'Marker', '.', 'MarkerSize', 12);        
     view([50 15]); grid on
     if isempty(labels)
         xlab = ['$x_\mathrm{',num2str(outdof(1)),'}$'];
