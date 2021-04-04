@@ -1,4 +1,4 @@
-# Torus toolbox for dynamical systems
+# A COCO-based torus toolbox for dynamical systems
 
 This repo presents a torus toolbox for *autonomous* systems and *non-autonomous* systems subject to *harmonic* external forcing. It calculates a family of tori based on parameter continuation. This toolbox includes
 
